@@ -2,6 +2,8 @@ package main
 
 import (
 	"go-url-shortener/internal/config"
+	"go-url-shortener/internal/lib/logger/sl"
+	"go-url-shortener/internal/storage/postgres"
 	"log/slog"
 	"os"
 )
@@ -15,26 +17,29 @@ const (
 func main() {
 	// init config: cleanenv
 	cfg := config.MustLoad()
-	// fmt.Println(cfg)
 
 	// init logger: slog
 	log := setupLogger(cfg.Env)
 	log.Info("starting url-shortener", slog.String("env", cfg.Env))
 	log.Debug("debug messages are enabled")
-	
-	// init storage: postgress
-	storage, err := 
 
+	// init storage: postgress
+	storage, err := postgres.NewStorage(cfg.Postgress)
+	if err != nil {
+		log.Error("failed to init storage", sl.Err(err))
+		os.Exit(1)
+	}
+	_ = storage
 
 	// init router: chi, "chi render"
 
 	// start server:
 }
 
-func setupLogger(env string) *slog.Logger{
+func setupLogger(env string) *slog.Logger {
 	var log *slog.Logger
 
-	switch env{
+	switch env {
 	case envLocal:
 		log = slog.New(
 			slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
