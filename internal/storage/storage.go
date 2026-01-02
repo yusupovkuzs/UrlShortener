@@ -1,6 +1,9 @@
 package storage
 
-import "errors"
+import (
+	// embedded
+	"errors"
+)
 
 var (
 	ErrURLNotFound = errors.New("url not found")

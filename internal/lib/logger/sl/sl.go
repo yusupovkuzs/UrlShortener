@@ -1,6 +1,7 @@
 package sl
 
 import (
+	// embedded
 	"log/slog"
 )
 

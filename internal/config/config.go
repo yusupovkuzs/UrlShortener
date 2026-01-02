@@ -1,9 +1,12 @@
 package config
 
 import (
+	// embedded
 	"log"
 	"os"
 	"time"
+
+	// external
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
@@ -22,13 +25,15 @@ type PostgressConfig struct {
 }
 
 type HttpServerConfig struct {
-	Address     string        `yaml:"address" env-default:":8080"`
+	Address     string        `yaml:"address" env-default:":8082"`
 	Timeout     time.Duration `yaml:"timeout" env-default:"4s"`
 	IdleTimeout time.Duration `yaml:"idle_timeout" env-default:"60s"`
+	User		string        `yaml:"user" env-required:"true"`
+	Password	string        `yaml:"password" env-required:"true" env:"HTTP_SERVER_PASSWORD"`
 }
 
 func MustLoad() *Config {
-	configPath := "D:/go-url-shortener/config/local.yaml" 
+	configPath := "D:/GoStudy/go-url-shortener/config/local.yaml" 
 	if err := os.Setenv("CONFIG_PATH", configPath); err != nil {
 		log.Fatal("CONFIG_PATH is not set")
 		return nil

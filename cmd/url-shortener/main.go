@@ -1,11 +1,24 @@
 package main
 
 import (
+	// project
 	"go-url-shortener/internal/config"
+	"go-url-shortener/internal/http-server/handlers/url/save"
+	mwLogger "go-url-shortener/internal/http-server/middleware/logger"
+	"go-url-shortener/internal/lib/logger/handlers/slogpretty"
 	"go-url-shortener/internal/lib/logger/sl"
 	"go-url-shortener/internal/storage/postgres"
+	"go-url-shortener/internal/http-server/handlers/redirect"
+	"go-url-shortener/internal/http-server/handlers/delete"
+
+	// embedded
 	"log/slog"
 	"os"
+	"net/http"
+
+	// external
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 const (
@@ -32,8 +45,40 @@ func main() {
 	_ = storage
 
 	// init router: chi, "chi render"
+	router := chi.NewRouter()
+	// middleware
+	router.Use(middleware.RequestID)
+	router.Use(mwLogger.New(log))
+	router.Use(middleware.Recoverer)
+	router.Use(middleware.URLFormat)
+	// autherization
+	router.Route("/url", func(r chi.Router) {
+		r.Use(middleware.BasicAuth("url-shortener", map[string]string{
+			cfg.HttpServer.User: cfg.HttpServer.Password,
+		}))	
 
-	// start server:
+		r.Post("/", save.New(log, storage))
+		r.Delete("/{alias}", delete.New(log, storage))
+	})
+	// handlers
+	router.Get("/{alias}", redirect.New(log, storage)) 
+
+	// start server
+	log.Info("starting server", slog.String("address", cfg.HttpServer.Address))
+	srv := &http.Server{
+		Addr:         cfg.HttpServer.Address,
+		Handler:      router,
+		ReadTimeout:  cfg.HttpServer.Timeout,
+		WriteTimeout: cfg.HttpServer.Timeout,
+		IdleTimeout:  cfg.HttpServer.IdleTimeout,
+	}
+	
+	if err := srv.ListenAndServe(); err != nil {
+		log.Error("failed to stop server")
+		return
+	}
+
+	log.Info("server stopped")
 }
 
 func setupLogger(env string) *slog.Logger {
@@ -41,9 +86,7 @@ func setupLogger(env string) *slog.Logger {
 
 	switch env {
 	case envLocal:
-		log = slog.New(
-			slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
-		)
+		log = setupPrettySlog()
 	case envDev:
 		log = slog.New(
 			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
@@ -55,4 +98,16 @@ func setupLogger(env string) *slog.Logger {
 	}
 
 	return log
+}
+
+func setupPrettySlog() *slog.Logger {
+	opts := slogpretty.PrettyHandlerOptions{
+		SlogOpts: &slog.HandlerOptions{
+			Level: slog.LevelDebug,
+		},
+	}
+
+	handler := opts.NewPrettyHandler(os.Stdout)
+
+	return slog.New(handler)
 }

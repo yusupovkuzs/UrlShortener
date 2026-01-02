@@ -1,11 +1,16 @@
 package postgres
 
 import (
-	"database/sql"
-	"fmt"
-	"github.com/lib/pq"
+	// project
 	"go-url-shortener/internal/config"
 	"go-url-shortener/internal/storage"
+
+	// embedded
+	"database/sql"
+	"fmt"
+
+	// external 
+	"github.com/lib/pq"
 )
 
 type Storage struct {
@@ -53,4 +58,19 @@ func (s *Storage) GetURL(alias string) (string, error) {
 		return "", fmt.Errorf("%w", err)
 	}
 	return url, nil
+}
+
+func (s *Storage) DeleteURL(alias string) error {
+    res, err := s.db.Exec("DELETE FROM url WHERE alias=$1", alias)
+    if err != nil {
+        return fmt.Errorf("%w", err)
+    }
+    ra, err := res.RowsAffected()
+    if err != nil {
+        return fmt.Errorf("%w", err)
+    }
+    if ra == 0 {
+        return fmt.Errorf("%w", storage.ErrURLNotFound)
+    }
+    return nil
 }
