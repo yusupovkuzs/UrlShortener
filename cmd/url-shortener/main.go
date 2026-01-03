@@ -3,7 +3,7 @@ package main
 import (
 	// project
 	"go-url-shortener/internal/config"
-	"go-url-shortener/internal/http-server/handlers/url/save"
+	"go-url-shortener/internal/http-server/handlers/save"
 	mwLogger "go-url-shortener/internal/http-server/middleware/logger"
 	"go-url-shortener/internal/lib/logger/handlers/slogpretty"
 	"go-url-shortener/internal/lib/logger/sl"
@@ -37,7 +37,7 @@ func main() {
 	log.Debug("debug messages are enabled")
 
 	// init storage: postgress
-	storage, err := postgres.NewStorage(cfg.Postgress)
+	storage, err := postgres.NewStorage(cfg.Postgres)
 	if err != nil {
 		log.Error("failed to init storage", sl.Err(err))
 		os.Exit(1)

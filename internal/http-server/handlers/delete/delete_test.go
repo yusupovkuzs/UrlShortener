@@ -3,7 +3,7 @@ package delete_test
 import (
 	// project
 	"go-url-shortener/internal/http-server/handlers/delete"
-	"go-url-shortener/internal/http-server/handlers/delete/mocks"
+	"go-url-shortener/internal/http-server/handlers/mocks"
 	"go-url-shortener/internal/lib/logger/handlers/slogdiscard"
 	"go-url-shortener/internal/storage"
 	

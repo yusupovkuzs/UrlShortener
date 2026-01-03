@@ -17,7 +17,7 @@ type Storage struct {
 	db *sql.DB
 }
 
-func NewStorage(dbInfo config.PostgressConfig) (*Storage, error) {
+func NewStorage(dbInfo config.PostgresConfig) (*Storage, error) {
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbInfo.Host, dbInfo.Port, dbInfo.User, dbInfo.Password, dbInfo.DBName)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
@@ -27,7 +27,7 @@ func NewStorage(dbInfo config.PostgressConfig) (*Storage, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
-	stmt := "CREATE TABLE IF NOT EXISTS url(id INTEGER PRIMARY KEY, alias TEXT UNIQUE NOT NULL, url TEXT NOT NULL); CREATE INDEX IF NOT EXISTS idx_alias ON url(alias);"
+	stmt := "CREATE TABLE IF NOT EXISTS url(id BIGSERIAL PRIMARY KEY, alias TEXT UNIQUE NOT NULL, url TEXT NOT NULL); CREATE INDEX IF NOT EXISTS idx_alias ON url(alias);"
 
 	_, err = db.Exec(stmt)
 	if err != nil {

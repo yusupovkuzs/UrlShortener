@@ -2,8 +2,8 @@ package save_test
 
 import (
 	// project
-	"go-url-shortener/internal/http-server/handlers/url/save"
-	"go-url-shortener/internal/http-server/handlers/url/save/mocks"
+	"go-url-shortener/internal/http-server/handlers/save"
+	"go-url-shortener/internal/http-server/handlers/mocks"
 	"go-url-shortener/internal/lib/logger/handlers/slogdiscard"
 	
 	// embedded

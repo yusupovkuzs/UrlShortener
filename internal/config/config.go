@@ -12,11 +12,11 @@ import (
 
 type Config struct {
 	Env        string           `yaml:"env" env-default:"local"`
-	Postgress  PostgressConfig  `yaml:"postgress"`
+	Postgres  PostgresConfig  `yaml:"postgres"`
 	HttpServer HttpServerConfig `yaml:"http_server"`
 }
 
-type PostgressConfig struct {
+type PostgresConfig struct {
 	Host     string `yaml:"host" env-default:"localhost"`
 	Port     string `yaml:"port" env-default:"5432"`
 	User     string `yaml:"user" env-default:"postgres"`

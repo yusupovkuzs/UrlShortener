@@ -3,7 +3,7 @@ package redirect_test
 import (
 	// project
 	"go-url-shortener/internal/http-server/handlers/redirect"
-	"go-url-shortener/internal/http-server/handlers/redirect/mocks"
+	"go-url-shortener/internal/http-server/handlers/mocks"
 	"go-url-shortener/internal/lib/api"
 	"go-url-shortener/internal/lib/logger/handlers/slogdiscard"
 	
